@@ -24,28 +24,28 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     # Relationship
-    khatas: Mapped[List["Khata"]] = relationship(
-        "Khata", back_populates="user", cascade="all, delete-orphan"
+    accounts: Mapped[List["Account"]] = relationship(
+        "Account", back_populates="user", cascade="all, delete-orphan"
     )
 
 
-class Khata(Base):
-    __tablename__ = "khatas"
+class Account(Base):
+    __tablename__ = "accounts"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
 
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    khata_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    khata_type: Mapped[KhataType] = mapped_column(SQLEnum(KhataType), nullable=False)
+    account_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    account_type: Mapped[KhataType] = mapped_column(SQLEnum(KhataType), nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     # Relationships
-    user: Mapped["User"] = relationship("User", back_populates="khatas")
+    user: Mapped["User"] = relationship("User", back_populates="accounts")
     entries: Mapped[List["Entry"]] = relationship(
-        "Entry", back_populates="khata", cascade="all, delete-orphan"
+        "Entry", back_populates="account", cascade="all, delete-orphan"
     )
 
 
@@ -54,8 +54,8 @@ class Entry(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
 
-    khata_id: Mapped[int] = mapped_column(
-        ForeignKey("khatas.id", ondelete="CASCADE"), nullable=False,
+    account_id: Mapped[int] = mapped_column(
+        ForeignKey("accounts.id", ondelete="CASCADE"), nullable=False,
     )
 
     entry_date: Mapped[datetime.date] = mapped_column(Date, nullable=False)
@@ -65,4 +65,4 @@ class Entry(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     # Relationship
-    khata: Mapped["Khata"] = relationship("Khata", back_populates="entries")
+    account: Mapped["Account"] = relationship("Account", back_populates="entries")
