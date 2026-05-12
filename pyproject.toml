@@ -8,5 +8,6 @@ dependencies = [
     "aiosqlite>=0.22.1",
     "asyncpg>=0.31.0",
     "fastapi[standard]>=0.136.1",
+    "loguru>=0.7.3",
     "sqlalchemy[asyncio]>=2.0.49",
 ]

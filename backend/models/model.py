@@ -15,8 +15,10 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    user_name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
-    number: Mapped[str] = mapped_column(String(10), unique=True, nullable=False)
+    user_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    number: Mapped[str] = mapped_column(
+        String(10), unique=True, index=True, nullable=False
+    )
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -33,7 +35,7 @@ class Khata(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
 
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), nullable=False, oncascade="cascade"
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     khata_name: Mapped[str] = mapped_column(String(100), nullable=False)
     khata_type: Mapped[KhataType] = mapped_column(SQLEnum(KhataType), nullable=False)
@@ -53,7 +55,7 @@ class Entry(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
 
     khata_id: Mapped[int] = mapped_column(
-        ForeignKey("khatas.id"), nullable=False, oncascade="cascade"
+        ForeignKey("khatas.id", ondelete="CASCADE"), nullable=False,
     )
 
     entry_date: Mapped[datetime.date] = mapped_column(Date, nullable=False)

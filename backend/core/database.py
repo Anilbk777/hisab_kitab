@@ -8,7 +8,6 @@ DATABASE_URL = "sqlite+aiosqlite:///./hisab_kitab.db"
 
 engine = create_async_engine(
     DATABASE_URL,
-    echo=True,           # Set to False in production
     future=True,
 )
 
