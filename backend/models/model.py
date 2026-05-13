@@ -5,11 +5,9 @@ import enum
 from typing import List
 from backend.core.database import Base
 
-
 class KhataType(str, enum.Enum):
     INCOME = "income"
     EXPENSE = "expense"
-
 
 class User(Base):
     __tablename__ = "users"
@@ -37,7 +35,7 @@ class Account(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    account_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    account_name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
     account_type: Mapped[KhataType] = mapped_column(SQLEnum(KhataType), nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

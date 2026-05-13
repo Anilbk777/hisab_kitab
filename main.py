@@ -1,7 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 from backend.core.database import engine, Base
-from backend.api.v1 import users_router, accounts_router
+from backend.api.v1 import users_router, accounts_router, entries_router, auth_router
+from backend.core.exceptions import AppError
+from backend.core.logging import log
+from fastapi.responses import JSONResponse
 
 
 @asynccontextmanager
@@ -21,8 +24,38 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+
+@app.exception_handler(AppError)
+async def app_error_handler(request: Request, exc: AppError):
+    log.error("AppError: {} | Status: {}", exc.message, exc.status_code)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "message": exc.message,
+            "detail": exc.detail,
+        },
+    )
+
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    log.exception("Unhandled Exception occurred")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "message": "An unexpected error occurred.",
+            "detail": str(exc),
+        },
+    )
+
+
+app.include_router(auth_router.router)
 app.include_router(users_router.router)
 app.include_router(accounts_router.router)
+app.include_router(entries_router.router)
 
 
 @app.get("/")
