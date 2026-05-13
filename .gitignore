@@ -15,4 +15,3 @@ wheels/
 .pytest_cache
 .env.example
 .python-version
-hisab_kitab.db

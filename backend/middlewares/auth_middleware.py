@@ -22,6 +22,12 @@ async def get_current_user(
             detail="Invalid authentication credentials",
         )
     auth_service = AuthService(db)
-    return await auth_service.get_user_by_id(user_id)
+    user = await auth_service.get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+        )
+    return user
 
 CurrentUser = Annotated[UserResponse, Depends(get_current_user)]
