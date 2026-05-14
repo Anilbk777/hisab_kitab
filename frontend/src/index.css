@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+/* ── Global reset & base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Placeholder color ── */
+::placeholder {
+  color: rgba(168, 155, 194, 0.45);
+}
+
+/* ── Input autofill light override ── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #F5F1FB inset !important;
+  -webkit-text-fill-color: #2D2640 !important;
+  caret-color: #2D2640;
+}
+
+/* ── Spinner keyframe (used by Spinner SVG) ── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
