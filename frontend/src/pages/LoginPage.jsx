@@ -111,18 +111,32 @@ const LoginPage = () => {
 
     setLoading(true);
     try {
+      const formData = new URLSearchParams();
+      formData.append('username', form.phone.trim());
+      formData.append('password', form.password);
+
       const res  = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: form.phone.trim(), password: form.password }),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString(),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Login failed. Please try again.');
+
+      let data;
+      try {
+        data = await res.json();
+      } catch (e) {
+        throw new Error(`Server error (${res.status}). Please check if the backend is running.`);
+      }
+
+      if (!res.ok) throw new Error(data?.detail || 'Login failed. Please try again.');
 
       localStorage.setItem('hk_token', data.access_token);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      const msg = err.message === 'Failed to fetch' 
+        ? 'Unable to connect to server. Is the backend running?' 
+        : err.message;
+      setError(msg);
     } finally {
       setLoading(false);
     }
