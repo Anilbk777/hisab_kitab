@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Modal from "../Modal";
 
 const AccountList = ({ accounts, onDelete, onEdit }) => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedAccount, setSelectedAccount] = useState(null);
+    const navigate = useNavigate();
 
     const handleDelete = (account) => {
         setSelectedAccount(account);
@@ -22,7 +24,8 @@ const AccountList = ({ accounts, onDelete, onEdit }) => {
             {accounts.map((account) => (
                 <div
                     key={account.id}
-                    className="p-4 rounded-lg border-2 border-[#9B8BB8] flex justify-between items-center my-4"
+                    onClick={() => navigate(`/accounts/${account.id}/entries`)}
+                    className="p-5 rounded-xl border-2 border-[#E2DAF0] flex justify-between items-center my-4 cursor-pointer hover:bg-[#FDF8F2] hover:border-indigo-200 transition-all shadow-sm hover:shadow"
                 >
                     {/* account name */}
                     <h4 className="text-base font-semibold text-[#201833]">
@@ -35,15 +38,15 @@ const AccountList = ({ accounts, onDelete, onEdit }) => {
                             Rs. {Number(account.balance).toFixed(2)}
                         </p>
                         <button
-                            onClick={() => onEdit(account)}
-                            className="text-indigo-600 hover:text-indigo-800 font-medium px-2 py-1 bg-indigo-50 rounded transition-colors"
+                            onClick={(e) => { e.stopPropagation(); onEdit(account); }}
+                            className="text-indigo-600 hover:text-indigo-800 font-medium px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors shadow-sm"
                         >
                             Edit
                         </button>
 
                         <button
-                            onClick={() => handleDelete(account)}
-                            className="text-red-500 hover:text-red-700 font-medium px-2 py-1 bg-red-50 rounded transition-colors"
+                            onClick={(e) => { e.stopPropagation(); handleDelete(account); }}
+                            className="text-red-500 hover:text-red-700 font-medium px-3 py-1.5 bg-red-50 hover:bg-red-100 rounded-lg transition-colors shadow-sm"
                         >
                             Delete
                         </button>

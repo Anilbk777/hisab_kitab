@@ -60,7 +60,7 @@ class EntryService:
         return entry
 
     async def update_entry(
-        self, entry_id: int, entry_update: EntryUpdate, user_id: int
+        self, entry_id: int, user_id: int, entry_update: EntryUpdate
     ) -> Entry:
         """Business logic for updating an entry"""
         entry = await self.get_entry_by_id(entry_id, user_id)
@@ -72,3 +72,23 @@ class EntryService:
         """Business logic for deleting an entry"""
         entry = await self.get_entry_by_id(entry_id, user_id)
         await self.entry_repo.delete(entry)
+
+    async def get_account_with_entries(
+        self,
+        account_id: int,
+        user_id: int,
+        skip: int = 0,
+        limit: int = 10,
+    ):
+        """
+        Service-level method for account with paginated entries and computed balance.
+        """
+        # Check account existence and user ownership (same checks as get_entries)
+        account = await self.account_repo.get_by_id(account_id)
+        if not account:
+            raise NotFoundError("Account", account_id)
+
+        if account.user_id != user_id:
+            raise ForbiddenError("You are not authorized to access this account.")
+
+        return await self.entry_repo.get_account_with_entries(account_id, skip, limit)

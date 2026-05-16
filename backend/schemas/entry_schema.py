@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import Annotated, Optional
 from datetime import date, datetime
 from decimal import Decimal
+from backend.schemas.account import AccountResponse
 
 
 class EntryBase(BaseModel):
@@ -33,3 +34,14 @@ class EntryResponse(EntryBase):
     id: int
     account_id: int
     created_at: datetime
+
+class Pagination(BaseModel):
+    total: int
+    skip: int
+    limit: int
+
+class AccountWithEntriesResponse(BaseModel):
+    account: AccountResponse
+    balance: Decimal
+    entries: list[EntryResponse]
+    pagination: Pagination

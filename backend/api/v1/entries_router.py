@@ -4,7 +4,12 @@ from typing import List
 
 from backend.core.database import get_db
 from backend.services.entry_service import EntryService
-from backend.schemas.entry_schema import EntryCreate, EntryUpdate, EntryResponse
+from backend.schemas.entry_schema import (
+    EntryCreate,
+    EntryUpdate,
+    EntryResponse,
+    AccountWithEntriesResponse,
+)
 from backend.core.logging import get_logger
 from backend.middlewares.auth_middleware import CurrentUser
 
@@ -34,24 +39,48 @@ async def create_entry(
 
 @router.get(
     "/account/{account_id}",
-    response_model=List[EntryResponse],
+    response_model=AccountWithEntriesResponse,
     status_code=status.HTTP_200_OK,
-    summary="Get All Entries for Account",
+    summary="Get Account with Paginated Entries and Balance",
 )
-async def get_entries_by_account(
+async def get_account_with_entries(
     account_id: int,
     current_user: CurrentUser,
     db: AsyncSession = Depends(get_db),
     logger=Depends(get_logger),
     skip: int = 0,
-    limit: int = 100,
+    limit: int = 10,
 ):
-    """Get all entries for a specific account (latest first)"""
-    logger.debug("Router: Fetching entries for account_id: {}", account_id)
+    """
+    Get an account with its paginated entries and the computed total balance.
+    """
+    logger.info("Router: Fetching account {} with paginated entries.", account_id)
     entry_service = EntryService(db)
-    return await entry_service.get_entries_by_account(
+    return await entry_service.get_account_with_entries(
         account_id, current_user.id, skip, limit
     )
+
+
+# @router.get(
+#     "/account/{account_id}",
+#     response_model=List[EntryResponse],
+#     status_code=status.HTTP_200_OK,
+#     summary="Get All Entries for Account",
+# )
+# async def get_entries_by_account(
+#     account_id: int,
+#     current_user: CurrentUser,
+#     db: AsyncSession = Depends(get_db),
+#     logger=Depends(get_logger),
+#     skip: int = 0,
+#     limit: int = 100,
+# ):
+#     """Get all entries for a specific account (latest first)"""
+#     logger.debug("Router: Fetching entries for account_id: {}", account_id)
+#     entry_service = EntryService(db)
+#     return await entry_service.get_entries_by_account(
+#         account_id, current_user.id, skip, limit
+#     )
 
 
 @router.get("/{entry_id}", response_model=EntryResponse, status_code=status.HTTP_200_OK)
