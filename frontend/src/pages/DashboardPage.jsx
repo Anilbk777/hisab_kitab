@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HisabKitabLogo from '../components/HisabKitabLogo';
+import Modal from '../components/Modal';
+import AccountForm from '../components/Account/AccountForm';
+import AccountList from '../components/Account/AccountList';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [accountsLoading, setAccountsLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -54,6 +60,35 @@ const DashboardPage = () => {
     localStorage.removeItem('hk_token');
     navigate('/login');
   };
+
+  const [accounts, setAccounts] = useState([]);
+  const fetchAccounts = async () => {
+    try {
+      const token = localStorage.getItem("hk_token");
+
+      const res = await fetch("http://127.0.0.1:8000/api/accounts/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch accounts");
+      }
+
+      const data = await res.json();
+      console.log(data);
+      setAccounts(data);
+    } catch (err) {
+      console.error("Error fetching accounts:", err);
+    }
+    finally {
+      setAccountsLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
 
   if (loading) {
     return (
@@ -126,11 +161,34 @@ const DashboardPage = () => {
 
           {/* Recent Transactions Placeholder */}
           <div style={{ ...styles.card, marginTop: '24px' }}>
-            <h3 style={{ ...styles.cardTitle, marginBottom: '16px' }}>Recent Transactions</h3>
-            <div style={styles.emptyState}>
-              <p style={{ color: '#9B8BB8' }}>No transactions found yet.</p>
-              <button style={styles.addBtn}>+ Add Transaction</button>
+            <div className='flex justify-between items-center'>
+              <h3 style={{ ...styles.cardTitle, marginBottom: '16px' }}>Accounts</h3>
+              <button style={styles.addBtn} onClick={() => setIsModalOpen(true)}>+ Add Account</button>
+              {isModalOpen && (
+                <Modal onClose={() => setIsModalOpen(false)}>
+                  <AccountForm
+                    onSuccess={() => {
+                      setIsModalOpen(false);
+                      fetchAccounts();
+                    }}
+                  />
+                </Modal>
+              )}
             </div>
+
+            {accountsLoading ? (
+              <div className="flex justify-center items-center h-32">
+                <p className="text-gray-500">Loading accounts...</p>
+              </div>
+            ) : !accounts || accounts.length === 0 ? (
+              <div className="flex justify-center items-center h-32">
+                <p className="text-gray-500">No accounts added yet.</p>
+              </div>
+            ) : (
+              <AccountList accounts={accounts} />
+            )}
+
+
           </div>
         </main>
       </div>
@@ -265,14 +323,7 @@ const styles = {
     color: '#9B8BB8',
     margin: 0,
   },
-  emptyState: {
-    padding: '40px 0',
-    textAlign: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '16px',
-  },
+
   addBtn: {
     padding: '10px 20px',
     border: 'none',

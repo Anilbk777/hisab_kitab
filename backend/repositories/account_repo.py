@@ -6,6 +6,8 @@ from typing import Optional, List
 from backend.models.model import Account
 from backend.core.logging import log
 from backend.core.exceptions import DatabaseError
+from sqlalchemy import func
+from backend.models.model import Entry
 
 
 class AccountRepository:
@@ -87,3 +89,27 @@ class AccountRepository:
             await self.db.rollback()
             log.error("Database error deleting account {}: {}", account.id, e)
             raise DatabaseError("Failed to delete account from database.")
+
+    # get all accounts with amount(from entries) by user
+    async def get_accounts_with_balance(
+        self, user_id: int, skip: int = 0, limit: int = 10
+    ) -> list[tuple[Account, float]]:
+        try:
+            stmt = (
+                (
+                    select(
+                        Account,
+                        func.coalesce(func.sum(Entry.amount), 0).label("balance"),
+                    )
+                )
+                .outerjoin(Entry, Entry.account_id == Account.id)
+                .where(Account.user_id == user_id)
+                .group_by(Account.id)
+                .offset(skip)
+                .limit(limit)
+            )
+            result = await self.db.execute(stmt)
+            return result.all()
+        except SQLAlchemyError as e:
+            log.error("Database error fetching accounts for user {}: {}", user_id, e)
+            raise DatabaseError("Failed to fetch user accounts from database.")

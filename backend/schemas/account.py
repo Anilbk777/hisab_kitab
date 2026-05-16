@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from backend.models.model import KhataType
-
+from decimal import Decimal
 
 class AccountBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -29,3 +29,7 @@ class AccountUpdate(BaseModel):
     )
 class AccountResponse(AccountBase):
     id: int
+
+
+class AccountWithAmountResponse(AccountResponse):
+    balance: Decimal = Field(..., description="Balance of the account")

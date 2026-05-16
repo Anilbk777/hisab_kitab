@@ -5,6 +5,7 @@ from backend.api.v1 import users_router, accounts_router, entries_router, auth_r
 from backend.core.exceptions import AppError
 from backend.core.logging import log
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
@@ -23,6 +24,14 @@ app = FastAPI(
     description="Personal Finance Ledger App",
     version="1.0.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
