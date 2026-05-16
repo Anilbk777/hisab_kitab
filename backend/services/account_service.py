@@ -62,7 +62,7 @@ class AccountService:
         if not account:
             raise NotFoundError("Account", account_id)
         if account.user_id != user_id:
-            raise ForbiddenError("You are not authorized to view this account.")
+            raise ForbiddenError("You are not authorized to access this account.")
         return account
 
     async def update_account(

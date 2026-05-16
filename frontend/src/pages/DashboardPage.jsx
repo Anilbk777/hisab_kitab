@@ -12,6 +12,8 @@ const DashboardPage = () => {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [accountsLoading, setAccountsLoading] = useState(true);
+  const token = localStorage.getItem("hk_token");
+
 
 
   useEffect(() => {
@@ -90,6 +92,25 @@ const DashboardPage = () => {
     fetchAccounts();
   }, []);
 
+  const handleDeleteAccount = async (id) => {
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/accounts/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete account");
+      }
+
+      fetchAccounts();
+    } catch (err) {
+      console.error("Error deleting account:", err);
+    }
+  };
+ 
   if (loading) {
     return (
       <div style={styles.page}>
@@ -185,7 +206,7 @@ const DashboardPage = () => {
                 <p className="text-gray-500">No accounts added yet.</p>
               </div>
             ) : (
-              <AccountList accounts={accounts} />
+              <AccountList accounts={accounts} onDelete={handleDeleteAccount} />
             )}
 
 
