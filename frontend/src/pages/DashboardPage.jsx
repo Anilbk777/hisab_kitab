@@ -13,6 +13,9 @@ const DashboardPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [accountsLoading, setAccountsLoading] = useState(true);
   const token = localStorage.getItem("hk_token");
+  const [accounts, setAccounts] = useState([]);
+  const [editingAccount, setEditingAccount] = useState(null);
+
 
 
 
@@ -63,7 +66,6 @@ const DashboardPage = () => {
     navigate('/login');
   };
 
-  const [accounts, setAccounts] = useState([]);
   const fetchAccounts = async () => {
     try {
       const token = localStorage.getItem("hk_token");
@@ -110,7 +112,7 @@ const DashboardPage = () => {
       console.error("Error deleting account:", err);
     }
   };
- 
+
   if (loading) {
     return (
       <div style={styles.page}>
@@ -184,12 +186,14 @@ const DashboardPage = () => {
           <div style={{ ...styles.card, marginTop: '24px' }}>
             <div className='flex justify-between items-center'>
               <h3 style={{ ...styles.cardTitle, marginBottom: '16px' }}>Accounts</h3>
-              <button style={styles.addBtn} onClick={() => setIsModalOpen(true)}>+ Add Account</button>
+              <button style={styles.addBtn} onClick={() => { setEditingAccount(null); setIsModalOpen(true); }}>+ Add Account</button>
               {isModalOpen && (
-                <Modal onClose={() => setIsModalOpen(false)}>
+                <Modal onClose={() => { setIsModalOpen(false); setEditingAccount(null); }}>
                   <AccountForm
+                    account={editingAccount}
                     onSuccess={() => {
                       setIsModalOpen(false);
+                      setEditingAccount(null);
                       fetchAccounts();
                     }}
                   />
@@ -206,7 +210,10 @@ const DashboardPage = () => {
                 <p className="text-gray-500">No accounts added yet.</p>
               </div>
             ) : (
-              <AccountList accounts={accounts} onDelete={handleDeleteAccount} />
+              <AccountList accounts={accounts} onDelete={handleDeleteAccount} onEdit={(account) => {
+                setEditingAccount(account);
+                setIsModalOpen(true);
+              }} />
             )}
 
 

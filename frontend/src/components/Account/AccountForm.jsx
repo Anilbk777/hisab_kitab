@@ -1,13 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-function AccountForm({ onSuccess }) {
-    const [accountName, setAccountName] = useState("");
-    const [accountType, setAccountType] = useState("");
+function AccountForm({ account, onSuccess }) {
+    // add edit feature 
+    const [accountName, setAccountName] = useState(account?.account_name || "");
+    const [accountType, setAccountType] = useState(account?.account_type || "");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    useEffect(() => {
+        if (account) {
+            setAccountName(account.account_name || "");
+            setAccountType(account.account_type || "");
+        } else {
+            setAccountName("");
+            setAccountType("");
+        }
+    }, [account]);
+
+    const isEditMode = !!account;
+
     const isValid =
-        accountName.trim() !== "" &&
-        accountType.trim() !== "";
+        (accountName || "").trim() !== "" &&
+        (accountType || "").trim() !== "";
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,9 +36,14 @@ function AccountForm({ onSuccess }) {
                 account_name: accountName,
                 account_type: accountType,
             };
+            const url = account
+                ? `http://localhost:8000/api/accounts/${account.id}`
+                : "http://localhost:8000/api/accounts";
 
-            const res = await fetch("http://localhost:8000/api/accounts", {
-                method: "POST",
+            const method = account ? "PATCH" : "POST";
+
+            const res = await fetch(url, {
+                method: method,
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
@@ -34,17 +52,20 @@ function AccountForm({ onSuccess }) {
             });
 
             if (!res.ok) {
-                throw new Error("Failed to add account");
+                throw new Error(isEditMode
+                    ? "Failed to update account"
+                    : "Failed to create account"
+                );
             }
 
             const data = await res.json();
-            console.log("Account added:", data);
+            console.log(isEditMode ? "Account updated:" : "Account added:", data);
 
             setAccountName("");
             setAccountType("");
             onSuccess?.();
         } catch (err) {
-            console.error("Error creating account:", err);
+            console.error(isEditMode ? "Error updating account:" : "Error creating account:", err);
         } finally {
             setIsSubmitting(false);
         }
@@ -53,7 +74,7 @@ function AccountForm({ onSuccess }) {
     return (
         <form onSubmit={handleSubmit}>
             <h2 className="text-2xl font-bold mb-6 text-gray-800">
-                Add New Account
+                {isEditMode ? "Edit Account" : "Add New Account"}
             </h2>
 
             <div className="mb-4">
@@ -93,7 +114,7 @@ function AccountForm({ onSuccess }) {
                 disabled={!isValid || isSubmitting}
                 className="w-full bg-linear-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:shadow-md transition-all"
             >
-                {isSubmitting ? "Creating Account..." : "Create Account"}
+                {isSubmitting ? (isEditMode ? "Updating Account..." : "Creating Account...") : (isEditMode ? "Update Account" : "Create Account")}
             </button>
         </form>
     );
