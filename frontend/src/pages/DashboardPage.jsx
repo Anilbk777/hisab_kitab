@@ -19,10 +19,21 @@ const DashboardPage = () => {
   const [accountError, setAccountError] = useState(null);
   const [activeTab, setActiveTab] = useState('income');
 
+  // Helpers to get current month date range bounds in YYYY-MM-DD format
+  const getFirstDayOfMonth = () => {
+    const date = new Date();
+    return new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0];
+  };
 
+  const getLastDayOfMonth = () => {
+    const date = new Date();
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString().split('T')[0];
+  };
 
+  const [fromDate, setFromDate] = useState(getFirstDayOfMonth());
+  const [toDate, setToDate] = useState(getLastDayOfMonth());
 
-  const fetchUser = useCallback(async () => {
+  const fetchUser = useCallback(async (from = fromDate, to = toDate) => {
     const token = localStorage.getItem('hk_token');
     if (!token) {
       navigate('/login');
@@ -30,7 +41,8 @@ const DashboardPage = () => {
     }
 
     try {
-      const res = await fetchWithAuth('/api/auth/me');
+      const url = `/api/auth/me?from_date=${from}&to_date=${to}`;
+      const res = await fetchWithAuth(url);
 
       if (!res.ok) {
         throw new Error('Session expired. Please log in again.');
@@ -57,7 +69,7 @@ const DashboardPage = () => {
   }, [navigate]);
 
   useEffect(() => {
-    fetchUser();
+    fetchUser(getFirstDayOfMonth(), getLastDayOfMonth());
   }, [fetchUser]);
 
   const handleLogout = () => {
@@ -65,9 +77,10 @@ const DashboardPage = () => {
     navigate('/login');
   };
 
-  const fetchAccounts = async () => {
+  const fetchAccounts = useCallback(async (from = fromDate, to = toDate) => {
     try {
-      const res = await fetchWithAuth("http://127.0.0.1:8000/api/accounts/");
+      const url = `http://127.0.0.1:8000/api/accounts/?from_date=${from}&to_date=${to}`;
+      const res = await fetchWithAuth(url);
 
       if (!res.ok) {
         throw new Error("Failed to fetch accounts");
@@ -81,10 +94,11 @@ const DashboardPage = () => {
     finally {
       setAccountsLoading(false);
     }
-  };
-  useEffect(() => {
-    fetchAccounts();
   }, []);
+
+  useEffect(() => {
+    fetchAccounts(getFirstDayOfMonth(), getLastDayOfMonth());
+  }, [fetchAccounts]);
 
   const handleDeleteAccount = async (id) => {
     try {
@@ -96,8 +110,8 @@ const DashboardPage = () => {
         throw new Error("Failed to delete account");
       }
 
-      fetchAccounts();
-      fetchUser();
+      fetchAccounts(fromDate, toDate);
+      fetchUser(fromDate, toDate);
     } catch (err) {
       console.error("Error deleting account:", err);
     }
@@ -141,6 +155,54 @@ const DashboardPage = () => {
         {/* Dashboard Content */}
         <main style={styles.main}>
           <h2 style={styles.sectionTitle}>Overview</h2>
+          {/* date range search */}
+          <div className="flex flex-col md:flex-row md:items-center gap-3 my-4 p-4 bg-white/75 backdrop-blur-md border border-gray-100 rounded-2xl shadow-sm">
+            <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <span className="text-sm font-semibold text-gray-500 whitespace-nowrap min-w-[45px]">From:</span>
+                <input 
+                  type="date" 
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="p-2.5 border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200/50 rounded-xl w-full sm:w-44 text-sm text-[#1C1433] font-medium outline-none transition-all shadow-inner" 
+                />
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <span className="text-sm font-semibold text-gray-500 whitespace-nowrap min-w-[45px]">To:</span>
+                <input 
+                  type="date" 
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="p-2.5 border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200/50 rounded-xl w-full sm:w-44 text-sm text-[#1C1433] font-medium outline-none transition-all shadow-inner" 
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 w-full md:w-auto md:ml-auto">
+              <button 
+                onClick={() => {
+                  fetchUser(fromDate, toDate);
+                  fetchAccounts(fromDate, toDate);
+                }}
+                className="flex-1 md:flex-initial bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl hover:cursor-pointer transition-all shadow-sm hover:shadow-md active:scale-95"
+              >
+                Search
+              </button>
+              <button 
+                onClick={() => {
+                  const defaultFrom = getFirstDayOfMonth();
+                  const defaultTo = getLastDayOfMonth();
+                  setFromDate(defaultFrom);
+                  setToDate(defaultTo);
+                  fetchUser(defaultFrom, defaultTo);
+                  fetchAccounts(defaultFrom, defaultTo);
+                }}
+                className="flex-1 md:flex-initial bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm px-6 py-2.5 rounded-xl hover:cursor-pointer transition-all shadow-sm active:scale-95"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 min-h-[10px]" >
             {/* Income Card */}
@@ -154,7 +216,7 @@ const DashboardPage = () => {
                   </svg>
                 </div>
               </div>
-              <div style={styles.amount}>Rs.{user?.total_income}</div>
+              <div style={styles.amount}>Rs. {user?.total_income}</div>
               <p style={styles.cardSubtitle}>This month</p>
             </div>
 
@@ -169,7 +231,7 @@ const DashboardPage = () => {
                   </svg>
                 </div>
               </div>
-              <div style={styles.amount}>Rs. Rs.{user?.total_expense}</div>
+              <div style={styles.amount}>Rs. {user?.total_expense}</div>
               <p style={styles.cardSubtitle}>This month</p>
             </div>
           </div>
@@ -208,8 +270,8 @@ const DashboardPage = () => {
                     onSuccess={() => {
                       setIsModalOpen(false);
                       setEditingAccount(null);
-                      fetchAccounts();
-                      fetchUser();
+                      fetchAccounts(fromDate, toDate);
+                      fetchUser(fromDate, toDate);
                     }}
                     onError={(msg) => {
                       setIsModalOpen(false);

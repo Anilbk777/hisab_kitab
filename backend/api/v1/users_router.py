@@ -67,3 +67,4 @@ async def delete_user(
     user_service = UserService(db)
     await user_service.delete_user(user_id)
     return None
+

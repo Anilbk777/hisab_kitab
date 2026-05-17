@@ -2,6 +2,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Optional, List
+from datetime import date
 
 from backend.models.model import User, Account, Entry, KhataType
 from backend.core.logging import log
@@ -75,21 +76,30 @@ class UserRepository:
             log.error("Database error deleting user {}: {}", user.id, e)
             raise DatabaseError("Failed to delete user from database.")
 
-    async def total_income_and_expense(self, user_id: int) -> dict:
+    async def total_income_and_expense(
+        self, user_id: int, from_date: Optional[date] = None, to_date: Optional[date] = None
+    ) -> dict:
         """
-        Get total income and total expense for a user.
+        Get total income and total expense for a user, optionally filtered by date range.
         """
 
         try:
-            result = await self.db.execute(
+            stmt = (
                 select(
                     Account.account_type,
                     func.coalesce(func.sum(Entry.amount), 0).label("total"),
                 )
                 .join(Entry, Entry.account_id == Account.id)
                 .where(Account.user_id == user_id)
-                .group_by(Account.account_type)
             )
+
+            if from_date:
+                stmt = stmt.where(Entry.entry_date >= from_date)
+            if to_date:
+                stmt = stmt.where(Entry.entry_date <= to_date)
+
+            stmt = stmt.group_by(Account.account_type)
+            result = await self.db.execute(stmt)
 
             rows = result.all()
 

@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Optional, List
+from datetime import date
 
 from backend.models.model import Account
 from backend.core.logging import log
@@ -92,7 +93,7 @@ class AccountRepository:
 
     # get all accounts with amount(from entries) by user
     async def get_accounts_with_balance(
-        self, user_id: int, skip: int = 0, limit: int = 10
+        self, user_id: int, skip: int = 0, limit: int = 10, from_date: Optional[date] = None, to_date: Optional[date] = None
     ) -> dict:
         try:
             #total count of accounts
@@ -100,19 +101,38 @@ class AccountRepository:
                 select(func.count(Account.id))
                 .where(Account.user_id == user_id)
             )
+            if from_date:
+                count_stmt = count_stmt.where(func.date(Account.created_at) >= from_date)
+            if to_date:
+                count_stmt = count_stmt.where(func.date(Account.created_at) <= to_date)
+
             count_result = await self.db.execute(count_stmt)
             total_count = count_result.scalar_one()
             
+            # Join condition with date range constraints on transactions
+            join_cond = Entry.account_id == Account.id
+            if from_date:
+                join_cond = join_cond & (Entry.entry_date >= from_date)
+            if to_date:
+                join_cond = join_cond & (Entry.entry_date <= to_date)
+
             stmt = (
-                (
-                    select(
-                        Account,
-                        func.coalesce(func.sum(Entry.amount), 0).label("balance"),
-                    )
+                select(
+                    Account,
+                    func.coalesce(func.sum(Entry.amount), 0).label("balance"),
                 )
-                .outerjoin(Entry, Entry.account_id == Account.id)
+                .outerjoin(Entry, join_cond)
                 .where(Account.user_id == user_id)
-                .group_by(Account.id)
+            )
+
+            # Filter accounts by their creation date
+            if from_date:
+                stmt = stmt.where(func.date(Account.created_at) >= from_date)
+            if to_date:
+                stmt = stmt.where(func.date(Account.created_at) <= to_date)
+
+            stmt = (
+                stmt.group_by(Account.id)
                 .offset(skip)
                 .limit(limit)
             )

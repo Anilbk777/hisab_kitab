@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Annotated
+from typing import Annotated, Optional
+from datetime import date
 
 from backend.core.database import get_db
 from backend.services.auth_service import AuthService
@@ -76,8 +77,12 @@ async def refresh_access_token(
 async def get_current_user(
     current_user: Annotated[UserResponse, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
 ):
     """Get current user"""
-    log.info("Router: Get current user: {}", current_user.number)
+    log.info("Router: Get current user: {}, from_date: {}, to_date: {}", current_user.number, from_date, to_date)
     auth_service = AuthService(db)
-    return await auth_service.get_user_info_by_id(current_user.id)
+    return await auth_service.get_user_info_by_id(
+        current_user.id, from_date=from_date, to_date=to_date
+    )

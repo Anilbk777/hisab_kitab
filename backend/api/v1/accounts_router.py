@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional
+from datetime import date
 
 from backend.core.database import get_db
 from backend.services.account_service import AccountService
@@ -36,15 +38,14 @@ async def get_all_accounts(
     logger=Depends(get_logger),
     skip: int = 0,
     limit: int = 20,
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
 ):
     user_id = current_user.id
-    logger.debug("Router: Fetching all accounts for user_id: {}", user_id)
+    logger.debug("Router: Fetching all accounts for user_id: {}, from_date: {}, to_date: {}", user_id, from_date, to_date)
     account_service = AccountService(db)
-    # return await account_service.get_all_accounts(
-    #     user_id=user_id, skip=skip, limit=limit
-    # )
     return await account_service.get_accounts_with_balance(
-        user_id=user_id, skip=skip, limit=limit
+        user_id=user_id, skip=skip, limit=limit, from_date=from_date, to_date=to_date
     )
 
 

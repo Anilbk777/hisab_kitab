@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import date
 
 from backend.repositories.account_repo import AccountRepository
 from backend.repositories.user_repo import UserRepository
@@ -87,11 +88,13 @@ class AccountService:
         await self.repository.delete(account)
 
     async def get_accounts_with_balance(
-        self, user_id: int, skip: int = 0, limit: int = 10
+        self, user_id: int, skip: int = 0, limit: int = 10, from_date: Optional[date] = None, to_date: Optional[date] = None
     ) -> dict:
-        ""  "Business logic for fetching all user accounts with balance"""
+        """Business logic for fetching all user accounts with balance"""
         log.info("Service: Fetching accounts with balance for user {}", user_id)
-        accounts_details = await self.repository.get_accounts_with_balance(user_id, skip, limit)
+        accounts_details = await self.repository.get_accounts_with_balance(
+            user_id, skip, limit, from_date=from_date, to_date=to_date
+        )
         accounts = accounts_details["accounts"]
         has_more = accounts_details["has_more"]
         return AccountListResponse(
