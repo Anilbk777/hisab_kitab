@@ -22,7 +22,7 @@ function Modal({ children, onClose }) {
       onClick={onClose} // backdrop click closes modal
     >
       <div
-        className="bg-white p-6 rounded w-[400px] relative"
+        className="bg-white p-7  rounded-2xl w-[400px] relative"
         role="dialog"
         aria-modal="true"
         onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside

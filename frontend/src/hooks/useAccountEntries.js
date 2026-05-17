@@ -34,8 +34,16 @@ export function useAccountEntries(accountId) {
             body: JSON.stringify({ ...payload, account_id: Number(accountId) })
         });
         if (!res.ok) {
-            const errData = await res.json();
-            throw new Error(errData.detail || 'Failed to create entry');
+            const errData = await res.json().catch(() => ({}));
+            let errMsg = 'Failed to create entry';
+            if (errData.message) {
+                errMsg = errData.message;
+            } else if (typeof errData.detail === 'string') {
+                errMsg = errData.detail;
+            } else if (Array.isArray(errData.detail)) {
+                errMsg = errData.detail.map(e => e.msg).join(', ');
+            }
+            throw new Error(errMsg);
         }
         await fetchAccountData();
     };
@@ -46,8 +54,16 @@ export function useAccountEntries(accountId) {
             body: JSON.stringify(payload)
         });
         if (!res.ok) {
-            const errData = await res.json();
-            throw new Error(errData.detail || 'Failed to update entry');
+            const errData = await res.json().catch(() => ({}));
+            let errMsg = 'Failed to update entry';
+            if (errData.message) {
+                errMsg = errData.message;
+            } else if (typeof errData.detail === 'string') {
+                errMsg = errData.detail;
+            } else if (Array.isArray(errData.detail)) {
+                errMsg = errData.detail.map(e => e.msg).join(', ');
+            }
+            throw new Error(errMsg);
         }
         await fetchAccountData();
     };

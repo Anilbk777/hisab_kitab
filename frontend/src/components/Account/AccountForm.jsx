@@ -100,21 +100,36 @@ function AccountForm({ account, onSuccess, onError }) {
             </div>
 
             <div className="mb-6">
-                <label className="block mb-2 text-sm font-medium text-gray-700">
+                <label className="block mb-2.5 text-sm font-medium text-gray-700">
                     Account Type
                 </label>
 
-                <select
-                    value={accountType}
-                    onChange={(e) => setAccountType(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                >
-                    <option value="">Select type...</option>
-                    <option value="income">Income</option>
-                    <option value="expense">Expense</option>
-                </select>
-
-
+                <div className="grid grid-cols-2 gap-3">
+                    <button
+                        type="button"
+                        onClick={() => setAccountType("income")}
+                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold border-2 transition-all cursor-pointer ${
+                            accountType === "income"
+                                ? "border-indigo-600 bg-indigo-50/40 text-indigo-600 shadow-sm"
+                                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600"
+                        }`}
+                    >
+                        <span className={`w-2 h-2 rounded-full transition-transform ${accountType === 'income' ? 'bg-indigo-600 scale-125' : 'bg-gray-400'}`}></span>
+                        Income
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setAccountType("expense")}
+                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold border-2 transition-all cursor-pointer ${
+                            accountType === "expense"
+                                ? "border-red-500 bg-red-50/40 text-red-500 shadow-sm"
+                                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600"
+                        }`}
+                    >
+                        <span className={`w-2 h-2 rounded-full transition-transform ${accountType === 'expense' ? 'bg-red-500 scale-125' : 'bg-gray-400'}`}></span>
+                        Expense
+                    </button>
+                </div>
             </div>
 
             <button

@@ -74,7 +74,6 @@ const DashboardPage = () => {
       }
 
       const data = await res.json();
-      console.log(data);
       setAccounts(data);
     } catch (err) {
       console.error("Error fetching accounts:", err);
@@ -143,7 +142,7 @@ const DashboardPage = () => {
         <main style={styles.main}>
           <h2 style={styles.sectionTitle}>Overview</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 min-h-[10px]" >
             {/* Income Card */}
             <div style={{ ...styles.card, ...styles.incomeCard }}>
               <div style={styles.cardHeader}>
@@ -177,25 +176,31 @@ const DashboardPage = () => {
 
           {/* Recent Transactions Placeholder */}
           <div style={{ ...styles.card, marginTop: '24px' }}>
-            <div className='flex justify-between items-center mb-6'>
-              <div className='flex items-center gap-6'>
-                <h3 style={{ ...styles.cardTitle }}>Accounts</h3>
-                <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:w-auto">
+                <h3 style={{ ...styles.cardTitle }} className="text-xl md:text-lg font-bold">Accounts</h3>
+                <div className="flex bg-gray-100 rounded-lg p-1 w-full sm:w-auto justify-center">
                   <button
                     onClick={() => setActiveTab('income')}
-                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'income' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`flex-1 sm:flex-initial px-4 py-1.5 text-sm font-medium rounded-md transition-all cursor-pointer ${activeTab === 'income' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                   >
                     Income
                   </button>
                   <button
                     onClick={() => setActiveTab('expense')}
-                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'expense' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`flex-1 sm:flex-initial px-4 py-1.5 text-sm font-medium rounded-md transition-all cursor-pointer ${activeTab === 'expense' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                   >
                     Expense
                   </button>
                 </div>
               </div>
-              <button style={styles.addBtn} onClick={() => { setEditingAccount(null); setIsModalOpen(true); }}>+ Add Account</button>
+              <button 
+                style={styles.addBtn} 
+                className="w-full md:w-auto text-center py-2.5 px-5 active:scale-95 transition-transform" 
+                onClick={() => { setEditingAccount(null); setIsModalOpen(true); }}
+              >
+                + Add Account
+              </button>
               {isModalOpen && (
                 <Modal onClose={() => { setIsModalOpen(false); setEditingAccount(null); }}>
                   <AccountForm
@@ -381,7 +386,7 @@ const styles = {
     justifyContent: 'center',
   },
   amount: {
-    fontSize: '32px',
+    fontSize: '24px',
     fontWeight: 700,
     color: '#1C1433',
     letterSpacing: '-0.02em',

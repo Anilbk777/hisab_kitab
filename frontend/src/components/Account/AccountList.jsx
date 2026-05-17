@@ -25,31 +25,38 @@ const AccountList = ({ accounts, onDelete, onEdit }) => {
                 <div
                     key={account.id}
                     onClick={() => navigate(`/accounts/${account.id}/entries`)}
-                    className="p-5 rounded-xl border-2 border-[#E2DAF0] flex justify-between items-center my-4 cursor-pointer hover:bg-[#FDF8F2] hover:border-indigo-200 transition-all shadow-sm hover:shadow"
+                    className="p-4 sm:p-5 rounded-xl border-2 border-[#E2DAF0] flex flex-col sm:flex-row sm:justify-between sm:items-center my-4 cursor-pointer hover:bg-[#FDF8F2] hover:border-indigo-200 transition-all shadow-sm hover:shadow gap-3"
                 >
-                    {/* account name */}
-                    <h4 className="text-base font-semibold text-[#201833]">
-                        {account.account_name} ({account.account_type})
-                    </h4>
-
-                    <div className="flex gap-2 items-center justify-between">
-                        {/* balance */}
-                        <p className="text-sm text-[#201833] font-medium mr-4">
+                    {/* Account Info: Name & Mobile Balance */}
+                    <div className="flex justify-between items-center w-full sm:w-auto">
+                        <h4 className="text-base font-semibold text-[#201833] break-all mr-2">
+                            {account.account_name} 
+                        </h4>
+                        <p className="sm:hidden text-sm text-[#201833] font-semibold whitespace-nowrap">
                             Rs. {Number(account.balance).toFixed(2)}
                         </p>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onEdit(account); }}
-                            className="text-indigo-600 hover:text-indigo-800 font-medium px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors shadow-sm"
-                        >
-                            Edit
-                        </button>
+                    </div>
 
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleDelete(account); }}
-                            className="text-red-500 hover:text-red-700 font-medium px-3 py-1.5 bg-red-50 hover:bg-red-100 rounded-lg transition-colors shadow-sm"
-                        >
-                            Delete
-                        </button>
+                    {/* Desktop Balance & Actions */}
+                    <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto border-t border-gray-100 pt-3 sm:border-0 sm:pt-0">
+                        <p className="hidden sm:block text-sm text-[#201833] font-medium mr-4">
+                            Rs. {Number(account.balance).toFixed(2)}
+                        </p>
+                        <div className="flex gap-2 w-full sm:w-auto justify-end">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onEdit(account); }}
+                                className="flex-1 sm:flex-initial text-center text-indigo-600 hover:text-indigo-800 font-medium px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors shadow-sm text-sm"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                onClick={(e) => { e.stopPropagation(); handleDelete(account); }}
+                                className="flex-1 sm:flex-initial text-center text-red-500 hover:text-red-700 font-medium px-3 py-1.5 bg-red-50 hover:bg-red-100 rounded-lg transition-colors shadow-sm text-sm"
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
 
                 </div>

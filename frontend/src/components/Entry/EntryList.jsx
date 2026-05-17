@@ -33,33 +33,40 @@ function EntryList({ entries, onEdit, onDelete, page, setPage, total, limit }) {
                     {entries.map((entry) => (
                         <div
                             key={entry.id}
-                            className="p-4 rounded-lg border border-blue-600/10 flex flex-col md:flex-row justify-between items-start md:items-center bg-white shadow-sm hover:shadow-md transition-all"
+                            className="p-4 rounded-xl border border-blue-600/10 flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white shadow-sm hover:shadow-md transition-all gap-3"
                         >
-                            <div className="flex-1 mb-3 md:mb-0">
-                                <div className="flex items-center gap-3 mb-1.5">
-                                    <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-md tracking-wide">
-                                        {entry.entry_date}
-                                    </span>
+                            {/* Entry Info: Date, Description & Mobile Amount */}
+                            <div className="flex-1 w-full">
+                                <div className="flex justify-between items-start w-full gap-3 mb-2.5">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-md tracking-wide">
+                                            {entry.entry_date}
+                                        </span>
+                                    </div>
+                                    <p className="sm:hidden text-lg font-bold text-[#1C1433] whitespace-nowrap">
+                                        Rs. {Number(entry.amount).toFixed(2)}
+                                    </p>
                                 </div>
-                                <p className="text-[#1C1433] font-medium text-base">
+                                <p className="text-[#1C1433] font-medium text-base wrap-break-word">
                                     {entry.description || <span className="italic text-gray-400 font-normal">No description provided</span>}
                                 </p>
                             </div>
 
-                            <div className="flex items-center gap-6 mt-2 md:mt-0 w-full md:w-auto justify-between md:justify-end">
-                                <p className="text-lg font-bold text-[#1C1433]">
+                            {/* Desktop Amount & Actions */}
+                            <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto border-t border-gray-100 pt-3 sm:border-0 sm:pt-0">
+                                <p className="hidden sm:block text-lg font-bold text-[#1C1433] mr-4 whitespace-nowrap">
                                     Rs. {Number(entry.amount).toFixed(2)}
                                 </p>
-                                <div className="flex gap-2">
+                                <div className="flex justify-between sm:justify-start gap-2 w-full sm:w-auto">
                                     <button
                                         onClick={() => onEdit(entry)}
-                                        className="text-indigo-600 hover:text-indigo-800 font-medium px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors text-sm"
+                                        className="flex-1 sm:flex-initial text-center text-indigo-600 hover:text-indigo-800 font-medium px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors text-sm sm:w-auto w-full"
                                     >
                                         Edit
                                     </button>
                                     <button
                                         onClick={() => handleDelete(entry)}
-                                        className="text-red-500 hover:text-red-700 font-medium px-3 py-1.5 bg-red-50 hover:bg-red-100 rounded-md transition-colors text-sm"
+                                        className="flex-1 sm:flex-initial text-center text-red-500 hover:text-red-700 font-medium px-3 py-1.5 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm sm:w-auto w-full"
                                     >
                                         Delete
                                     </button>

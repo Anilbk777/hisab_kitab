@@ -19,7 +19,8 @@ function EntryForm({ entry, onSubmit, isSubmitting }) {
     }, [entry]);
 
     const isEditMode = !!entry;
-    const isValid = entryDate && amount && Number(amount) > 0 && description.trim() !== "";
+    const isAmountValid = amount && Number(amount) > 0 && Number(amount) <= 10000000;
+    const isValid = entryDate && isAmountValid && description.trim() !== "";
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -85,12 +86,22 @@ function EntryForm({ entry, onSubmit, isSubmitting }) {
                     type="number"
                     step="0.01"
                     min="0.01"
+                    max="10000000"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-colors"
+                    className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 outline-none transition-colors ${
+                        Number(amount) > 10000000 
+                            ? "border-red-500 focus:ring-red-500" 
+                            : "border-gray-300 focus:ring-indigo-500"
+                    }`}
                     placeholder="e.g., 1500"
                     required
                 />
+                {Number(amount) > 10000000 && (
+                    <p className="mt-1.5 text-xs text-red-500 font-semibold">
+                        Amount cannot exceed Rs. 10,000,000.00
+                    </p>
+                )}
             </div>
 
             <button

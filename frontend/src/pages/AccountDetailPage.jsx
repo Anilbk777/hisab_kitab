@@ -40,7 +40,7 @@ const AccountDetailPage = () => {
             setEditingEntry(null);
         } catch (err) {
             console.error(err);
-            // Error handling inside form or just leave it
+            throw err; // Re-throw the error so EntryForm catches it locally and displays the red banner
         } finally {
             setIsSubmitting(false);
         }
@@ -94,7 +94,7 @@ const AccountDetailPage = () => {
                 <main className="py-8 flex-1">
                     {/* Account Summary Card */}
                     <div className={`bg-white border border-blue-600/10 rounded-2xl p-8 shadow-sm mb-8 border-t-4 ${isIncome ? 'border-t-green-500' : 'border-t-red-500'}`}>
-                        <div className="flex flex-col md:flex-row justify-between md:items-center gap-6">
+                        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
                                     <h2 className="text-3xl font-bold text-[#1C1433] capitalize">{account.account_name}</h2>
@@ -102,9 +102,9 @@ const AccountDetailPage = () => {
                                         {account.account_type}
                                     </span>
                                 </div>
-                                <p className="text-[#7B6F96] text-sm font-medium">Total Account Balance</p>
+                                <p className="text-[#7B6F96] text-md font-medium">Total Account Balance</p>
                             </div>
-                            <div className="text-5xl font-bold text-[#1C1433] tracking-tight">
+                            <div className="sm:text-4xl text-3xl font-bold text-[#1C1433] tracking-tight">
                                 Rs. {Number(balance).toFixed(2)}
                             </div>
                         </div>
