@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-function AccountForm({ account, onSuccess }) {
+function AccountForm({ account, onSuccess, onError }) {
     // add edit feature 
     const [accountName, setAccountName] = useState(account?.account_name || "");
     const [accountType, setAccountType] = useState(account?.account_type || "");
@@ -52,10 +52,18 @@ function AccountForm({ account, onSuccess }) {
             });
 
             if (!res.ok) {
-                throw new Error(isEditMode
-                    ? "Failed to update account"
-                    : "Failed to create account"
-                );
+                const errorData = await res.json().catch(() => ({}));
+                let errorMessage = isEditMode ? "Failed to update account" : "Failed to create account";
+                
+                if (errorData.message) {
+                    errorMessage = errorData.message;
+                } else if (typeof errorData.detail === 'string') {
+                    errorMessage = errorData.detail;
+                } else if (Array.isArray(errorData.detail)) {
+                    errorMessage = errorData.detail.map(e => e.msg).join(", ");
+                }
+
+                throw new Error(errorMessage);
             }
 
             const data = await res.json();
@@ -66,6 +74,11 @@ function AccountForm({ account, onSuccess }) {
             onSuccess?.();
         } catch (err) {
             console.error(isEditMode ? "Error updating account:" : "Error creating account:", err);
+            if (onError) {
+                onError(err.message);
+            } else {
+                alert(err.message);
+            }
         } finally {
             setIsSubmitting(false);
         }

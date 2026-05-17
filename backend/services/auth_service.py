@@ -4,7 +4,7 @@ from backend.core.exceptions import AuthenticationError
 from backend.security import SecurityService
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.schemas.auth_schema import TokenResponse
-from backend.schemas.user_schema import UserLogin, UserResponse
+from backend.schemas.user_schema import UserLogin, UserResponse, UserInfoResponse
 
 
 class AuthService:
@@ -48,6 +48,27 @@ class AuthService:
             return user
         except Exception as e:
             log.error("Service: Error getting current user: {}", e)
+            raise AuthenticationError("Invalid user")
+    
+    async def get_user_info_by_id(self, user_id: str) -> UserInfoResponse:
+        """Business logic for getting current user info"""
+        log.info("Service: Get current user info")
+        try:
+            if not user_id:
+                raise AuthenticationError("Invalid user id provided")
+            user = await self.repository.get_by_id(int(user_id))
+            if not user:
+                raise AuthenticationError("Invalid user")
+            totals = await self.repository.total_income_and_expense(int(user_id))
+            return UserInfoResponse(
+                id=user.id,
+                user_name=user.user_name,
+                number=user.number,
+                total_income=totals["total_income"],
+                total_expense=totals["total_expense"],
+            )
+        except Exception as e:
+            log.error("Service: Error getting current user info: {}", e)
             raise AuthenticationError("Invalid user")
 
     async def refresh_access_token(self, refresh_token: str) -> TokenResponse:

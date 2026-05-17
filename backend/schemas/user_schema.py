@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Annotated, Optional
 import re
 from datetime import datetime
-
+from decimal import Decimal
 
 class UserBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -95,4 +95,15 @@ class UserResponse(UserBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
     number: str
+
     created_at: datetime
+
+
+class UserInfoResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    user_name: str
+    number: str
+    total_income: Annotated[Decimal, Field(ge=0, examples=[150000.00], description="Total income of user")] = Decimal("0.00")
+    total_expense: Annotated[Decimal, Field(ge=0, examples=[50000.00], description="Total expense of user")] = Decimal("0.00")
+    

@@ -9,9 +9,9 @@ import EntryList from '../components/Entry/EntryList';
 const AccountDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { 
-        data, loading, error, page, setPage, limit, 
-        createEntry, updateEntry, deleteEntry 
+    const {
+        data, loading, error, page, setPage, limit,
+        createEntry, updateEntry, deleteEntry
     } = useAccountEntries(id);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,7 +48,7 @@ const AccountDetailPage = () => {
 
     if (loading && !data) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-[#FDF8F2] via-[#F7F0FC] to-[#FDF4F8] flex items-center justify-center font-['Inter',_sans-serif]">
+            <div className="min-h-screen bg-linear-to-r from-[#FDF8F2] via-[#F7F0FC] to-[#FDF4F8] flex items-center justify-center font-['Inter', sans-serif]">
                 <div className="text-[#2563EB] font-medium animate-pulse text-lg">Loading account details...</div>
             </div>
         );
@@ -56,7 +56,7 @@ const AccountDetailPage = () => {
 
     if (error && !data) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-[#FDF8F2] via-[#F7F0FC] to-[#FDF4F8] flex flex-col items-center justify-center gap-6 font-['Inter',_sans-serif]">
+            <div className="min-h-screen bg-linear-to-r from-[#FDF8F2] via-[#F7F0FC] to-[#FDF4F8] flex flex-col items-center justify-center gap-6 font-['Inter', sans-serif]">
                 <div className="p-6 bg-white rounded-2xl shadow-sm border border-red-100 max-w-md w-full text-center">
                     <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,7 +75,7 @@ const AccountDetailPage = () => {
     const isIncome = account.account_type === 'income';
 
     return (
-        <div className="min-h-screen relative overflow-hidden font-['Inter',_sans-serif] bg-gradient-to-br from-[#FDF8F2] via-[#F7F0FC] to-[#FDF4F8]">
+        <div className="min-h-screen relative overflow-hidden font-['Inter', sans-serif] bg-linear-to-r from-[#FDF8F2] via-[#F7F0FC] to-[#FDF4F8]">
             {/* Background Blobs (same as dashboard) */}
             <div className="absolute top-[-160px] right-[-160px] w-[480px] h-[480px] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.08)_0%,transparent_65%)] pointer-events-none" />
             <div className="absolute bottom-[-160px] left-[-120px] w-[420px] h-[420px] rounded-full bg-[radial-gradient(circle,rgba(29,78,216,0.08)_0%,transparent_65%)] pointer-events-none" />
@@ -83,8 +83,8 @@ const AccountDetailPage = () => {
             <div className="relative z-10 max-w-[1200px] mx-auto px-6 min-h-screen flex flex-col">
                 <header className="flex justify-between items-center py-6 border-b border-blue-600/10">
                     <HisabKitabLogo size="sm" showTag={false} theme="light" />
-                    <button 
-                        onClick={() => navigate('/dashboard')} 
+                    <button
+                        onClick={() => navigate('/dashboard')}
                         className="px-5 py-2.5 border border-[#E2DAF0] bg-white rounded-lg text-[#4A4065] text-sm font-semibold cursor-pointer hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
                     >
                         &larr; Back to Dashboard
@@ -117,9 +117,9 @@ const AccountDetailPage = () => {
                                 <h3 className="text-2xl font-bold text-[#1C1433] mb-1">Transaction Entries</h3>
                                 <p className="text-sm text-[#7B6F96]">Manage all entries for {account.account_name}</p>
                             </div>
-                            <button 
+                            <button
                                 onClick={handleOpenCreate}
-                                className="px-6 py-3 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-700 text-white rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2"
+                                className="px-6 py-3 bg-linear-to-r from-blue-500 via-blue-600 to-indigo-700 text-white rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2"
                             >
                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -133,9 +133,9 @@ const AccountDetailPage = () => {
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
                             </div>
                         ) : (
-                            <EntryList 
-                                entries={entries} 
-                                onEdit={handleOpenEdit} 
+                            <EntryList
+                                entries={entries}
+                                onEdit={handleOpenEdit}
                                 onDelete={deleteEntry}
                                 page={page}
                                 setPage={setPage}
@@ -149,10 +149,10 @@ const AccountDetailPage = () => {
 
             {isModalOpen && (
                 <Modal onClose={() => setIsModalOpen(false)}>
-                    <EntryForm 
-                        entry={editingEntry} 
-                        onSubmit={handleFormSubmit} 
-                        isSubmitting={isSubmitting} 
+                    <EntryForm
+                        entry={editingEntry}
+                        onSubmit={handleFormSubmit}
+                        isSubmitting={isSubmitting}
                     />
                 </Modal>
             )}

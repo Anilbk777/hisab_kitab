@@ -5,7 +5,7 @@ from typing import Annotated
 
 from backend.core.database import get_db
 from backend.services.auth_service import AuthService
-from backend.schemas.user_schema import UserLogin, UserResponse, UserCreate
+from backend.schemas.user_schema import UserLogin, UserResponse, UserCreate, UserInfoResponse
 from backend.schemas.auth_schema import TokenResponse, TokenRefresh
 from backend.core.logging import get_logger
 from backend.middlewares.auth_middleware import get_current_user
@@ -69,7 +69,7 @@ async def refresh_access_token(
 
 @router.get(
     "/me",
-    response_model=UserResponse,
+    response_model=UserInfoResponse,
     status_code=status.HTTP_200_OK,
     summary="Get Current User",
 )
@@ -80,4 +80,4 @@ async def get_current_user(
     """Get current user"""
     log.info("Router: Get current user: {}", current_user.number)
     auth_service = AuthService(db)
-    return await auth_service.get_user_by_id(current_user.id)
+    return await auth_service.get_user_info_by_id(current_user.id)

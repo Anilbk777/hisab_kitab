@@ -43,7 +43,7 @@ class AccountRepository:
         try:
             result = await self.db.execute(
                 select(Account).where(
-                    Account.account_name == name, Account.user_id == user_id
+                    func.lower(Account.account_name) == name.lower(), Account.user_id == user_id
                 )
             )
             return result.scalar_one_or_none()

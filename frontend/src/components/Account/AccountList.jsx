@@ -29,7 +29,7 @@ const AccountList = ({ accounts, onDelete, onEdit }) => {
                 >
                     {/* account name */}
                     <h4 className="text-base font-semibold text-[#201833]">
-                        {account.account_name}
+                        {account.account_name} ({account.account_type})
                     </h4>
 
                     <div className="flex gap-2 items-center justify-between">

@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
 
 from backend.core.database import get_db
 from backend.services.entry_service import EntryService

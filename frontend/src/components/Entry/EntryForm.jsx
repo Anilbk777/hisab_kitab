@@ -19,7 +19,7 @@ function EntryForm({ entry, onSubmit, isSubmitting }) {
     }, [entry]);
 
     const isEditMode = !!entry;
-    const isValid = entryDate && amount && Number(amount) > 0;
+    const isValid = entryDate && amount && Number(amount) > 0 && description.trim() !== "";
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -29,7 +29,7 @@ function EntryForm({ entry, onSubmit, isSubmitting }) {
         try {
             const payload = {
                 entry_date: entryDate,
-                description: description || null,
+                description: description.trim(),
                 amount: Number(amount),
             };
             await onSubmit(payload);
@@ -65,13 +65,14 @@ function EntryForm({ entry, onSubmit, isSubmitting }) {
 
             <div className="mb-4">
                 <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Description (Optional)
+                    Description
                 </label>
-                <input
+                <textarea
+                    required
                     type="text"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-colors min-h-10"
                     placeholder="e.g., Sold items, Paid rent"
                 />
             </div>
