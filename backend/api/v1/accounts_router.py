@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
 
 from backend.core.database import get_db
 from backend.services.account_service import AccountService
@@ -8,7 +7,7 @@ from backend.schemas.account import (
     AccountCreate,
     AccountUpdate,
     AccountResponse,
-    AccountWithAmountResponse,
+    AccountListResponse,
 )
 from backend.core.logging import get_logger
 from backend.middlewares.auth_middleware import CurrentUser
@@ -30,13 +29,13 @@ async def create_account(
     return account
 
 
-@router.get("/", response_model=List[AccountWithAmountResponse])
+@router.get("/", response_model=AccountListResponse)
 async def get_all_accounts(
     current_user: CurrentUser,
     db: AsyncSession = Depends(get_db),
     logger=Depends(get_logger),
     skip: int = 0,
-    limit: int = 10,
+    limit: int = 20,
 ):
     user_id = current_user.id
     logger.debug("Router: Fetching all accounts for user_id: {}", user_id)

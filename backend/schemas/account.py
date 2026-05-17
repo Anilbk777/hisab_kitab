@@ -33,3 +33,8 @@ class AccountResponse(AccountBase):
 
 class AccountWithAmountResponse(AccountResponse):
     balance: Decimal = Field(..., description="Balance of the account")
+
+class AccountListResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    accounts: list[AccountWithAmountResponse]
+    has_more: bool

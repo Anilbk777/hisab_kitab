@@ -48,7 +48,7 @@ async def get_account_with_entries(
     db: AsyncSession = Depends(get_db),
     logger=Depends(get_logger),
     skip: int = 0,
-    limit: int = 10,
+    limit: int = 50,
 ):
     """
     Get an account with its paginated entries and the computed total balance.

@@ -7,6 +7,7 @@ from backend.schemas.account import (
     AccountCreate,
     AccountUpdate,
     AccountWithAmountResponse,
+    AccountListResponse
 )
 from backend.models.model import Account
 from backend.core.exceptions import NotFoundError, DuplicateError, ForbiddenError
@@ -87,16 +88,21 @@ class AccountService:
 
     async def get_accounts_with_balance(
         self, user_id: int, skip: int = 0, limit: int = 10
-    ) -> list[AccountWithAmountResponse]:
-        """Business logic for fetching all user accounts with balance"""
+    ) -> dict:
+        ""  "Business logic for fetching all user accounts with balance"""
         log.info("Service: Fetching accounts with balance for user {}", user_id)
-        accounts = await self.repository.get_accounts_with_balance(user_id, skip, limit)
-        return [
-            AccountWithAmountResponse(
-                id=acc[0].id,
-                account_name=acc[0].account_name,
-                account_type=acc[0].account_type,
-                balance=acc[1],
-            )
-            for acc in accounts
-        ]
+        accounts_details = await self.repository.get_accounts_with_balance(user_id, skip, limit)
+        accounts = accounts_details["accounts"]
+        has_more = accounts_details["has_more"]
+        return AccountListResponse(
+            accounts=[
+                AccountWithAmountResponse(
+                    id=acc[0].id,
+                    account_name=acc[0].account_name,
+                    account_type=acc[0].account_type,
+                    balance=acc[1],
+                )
+                for acc in accounts
+            ],
+            has_more=has_more,
+        )

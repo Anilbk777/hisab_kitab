@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { fetchWithAuth } from '../utils/api';
 
 export function useAccountEntries(accountId) {
     const [data, setData] = useState(null);
@@ -11,11 +12,8 @@ export function useAccountEntries(accountId) {
         setLoading(true);
         setError(null);
         try {
-            const token = localStorage.getItem('hk_token');
             const skip = (page - 1) * limit;
-            const res = await fetch(`http://127.0.0.1:8000/api/entries/account/${accountId}?skip=${skip}&limit=${limit}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await fetchWithAuth(`http://127.0.0.1:8000/api/entries/account/${accountId}?skip=${skip}&limit=${limit}`);
             if (!res.ok) throw new Error('Failed to fetch account details');
             const result = await res.json();
             setData(result);
@@ -31,10 +29,8 @@ export function useAccountEntries(accountId) {
     }, [fetchAccountData]);
 
     const createEntry = async (payload) => {
-        const token = localStorage.getItem('hk_token');
-        const res = await fetch(`http://127.0.0.1:8000/api/entries/`, {
+        const res = await fetchWithAuth(`http://127.0.0.1:8000/api/entries/`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({ ...payload, account_id: Number(accountId) })
         });
         if (!res.ok) {
@@ -45,10 +41,8 @@ export function useAccountEntries(accountId) {
     };
 
     const updateEntry = async (entryId, payload) => {
-        const token = localStorage.getItem('hk_token');
-        const res = await fetch(`http://127.0.0.1:8000/api/entries/${entryId}`, {
+        const res = await fetchWithAuth(`http://127.0.0.1:8000/api/entries/${entryId}`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify(payload)
         });
         if (!res.ok) {
@@ -59,10 +53,8 @@ export function useAccountEntries(accountId) {
     };
 
     const deleteEntry = async (entryId) => {
-        const token = localStorage.getItem('hk_token');
-        const res = await fetch(`http://127.0.0.1:8000/api/entries/${entryId}`, {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` }
+        const res = await fetchWithAuth(`http://127.0.0.1:8000/api/entries/${entryId}`, {
+            method: 'DELETE'
         });
         if (!res.ok) throw new Error('Failed to delete entry');
         await fetchAccountData();

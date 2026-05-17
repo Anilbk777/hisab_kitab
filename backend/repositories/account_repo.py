@@ -93,8 +93,16 @@ class AccountRepository:
     # get all accounts with amount(from entries) by user
     async def get_accounts_with_balance(
         self, user_id: int, skip: int = 0, limit: int = 10
-    ) -> list[tuple[Account, float]]:
+    ) -> dict:
         try:
+            #total count of accounts
+            count_stmt = (
+                select(func.count(Account.id))
+                .where(Account.user_id == user_id)
+            )
+            count_result = await self.db.execute(count_stmt)
+            total_count = count_result.scalar_one()
+            
             stmt = (
                 (
                     select(
@@ -109,7 +117,12 @@ class AccountRepository:
                 .limit(limit)
             )
             result = await self.db.execute(stmt)
-            return result.all()
+            accounts = [row for row in result.all()]
+            has_more = total_count > (skip + limit)
+            return {
+                "accounts": accounts,
+                "has_more": has_more,
+            }
         except SQLAlchemyError as e:
             log.error("Database error fetching accounts for user {}: {}", user_id, e)
             raise DatabaseError("Failed to fetch user accounts from database.")

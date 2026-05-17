@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { fetchWithAuth } from "../../utils/api";
 
 function AccountForm({ account, onSuccess, onError }) {
     // add edit feature 
@@ -30,8 +31,6 @@ function AccountForm({ account, onSuccess, onError }) {
         setIsSubmitting(true);
 
         try {
-            const token = localStorage.getItem("hk_token");
-
             const payload = {
                 account_name: accountName,
                 account_type: accountType,
@@ -42,12 +41,8 @@ function AccountForm({ account, onSuccess, onError }) {
 
             const method = account ? "PATCH" : "POST";
 
-            const res = await fetch(url, {
+            const res = await fetchWithAuth(url, {
                 method: method,
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
                 body: JSON.stringify(payload),
             });
 

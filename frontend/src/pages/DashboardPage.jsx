@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchWithAuth } from '../utils/api';
 import HisabKitabLogo from '../components/HisabKitabLogo';
 import Modal from '../components/Modal';
 import AccountForm from '../components/Account/AccountForm';
@@ -16,51 +17,48 @@ const DashboardPage = () => {
   const [accounts, setAccounts] = useState([]);
   const [editingAccount, setEditingAccount] = useState(null);
   const [accountError, setAccountError] = useState(null);
+  const [activeTab, setActiveTab] = useState('income');
 
 
 
+
+  const fetchUser = useCallback(async () => {
+    const token = localStorage.getItem('hk_token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const res = await fetchWithAuth('/api/auth/me');
+
+      if (!res.ok) {
+        throw new Error('Session expired. Please log in again.');
+      }
+
+      let data;
+      try {
+        data = await res.json();
+      } catch (e) {
+        throw new Error('Invalid response from server.');
+      }
+
+      setUser(data);
+    } catch (err) {
+      const msg = err.message === 'Failed to fetch'
+        ? 'Unable to connect to server. Please check backend.'
+        : err.message;
+      setError(msg);
+      localStorage.removeItem('hk_token');
+      navigate('/login');
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const token = localStorage.getItem('hk_token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
-      try {
-        const res = await fetch('/api/auth/me', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!res.ok) {
-          throw new Error('Session expired. Please log in again.');
-        }
-
-        let data;
-        try {
-          data = await res.json();
-        } catch (e) {
-          throw new Error('Invalid response from server.');
-        }
-
-        setUser(data);
-      } catch (err) {
-        const msg = err.message === 'Failed to fetch'
-          ? 'Unable to connect to server. Please check backend.'
-          : err.message;
-        setError(msg);
-        localStorage.removeItem('hk_token');
-        navigate('/login');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUser();
-  }, [navigate]);
+  }, [fetchUser]);
 
   const handleLogout = () => {
     localStorage.removeItem('hk_token');
@@ -69,13 +67,7 @@ const DashboardPage = () => {
 
   const fetchAccounts = async () => {
     try {
-      const token = localStorage.getItem("hk_token");
-
-      const res = await fetch("http://127.0.0.1:8000/api/accounts/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetchWithAuth("http://127.0.0.1:8000/api/accounts/");
 
       if (!res.ok) {
         throw new Error("Failed to fetch accounts");
@@ -97,11 +89,8 @@ const DashboardPage = () => {
 
   const handleDeleteAccount = async (id) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/accounts/${id}`, {
+      const res = await fetchWithAuth(`http://127.0.0.1:8000/api/accounts/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!res.ok) {
@@ -109,6 +98,7 @@ const DashboardPage = () => {
       }
 
       fetchAccounts();
+      fetchUser();
     } catch (err) {
       console.error("Error deleting account:", err);
     }
@@ -127,6 +117,8 @@ const DashboardPage = () => {
   if (error) {
     return null; // Will redirect via useEffect
   }
+
+  const filteredAccounts = accounts?.accounts?.filter(acc => acc.account_type === activeTab) || [];
 
   return (
     <div style={styles.page}>
@@ -185,8 +177,24 @@ const DashboardPage = () => {
 
           {/* Recent Transactions Placeholder */}
           <div style={{ ...styles.card, marginTop: '24px' }}>
-            <div className='flex justify-between items-center'>
-              <h3 style={{ ...styles.cardTitle, marginBottom: '16px' }}>Accounts</h3>
+            <div className='flex justify-between items-center mb-6'>
+              <div className='flex items-center gap-6'>
+                <h3 style={{ ...styles.cardTitle }}>Accounts</h3>
+                <div className="flex bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setActiveTab('income')}
+                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'income' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Income
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('expense')}
+                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'expense' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Expense
+                  </button>
+                </div>
+              </div>
               <button style={styles.addBtn} onClick={() => { setEditingAccount(null); setIsModalOpen(true); }}>+ Add Account</button>
               {isModalOpen && (
                 <Modal onClose={() => { setIsModalOpen(false); setEditingAccount(null); }}>
@@ -196,6 +204,7 @@ const DashboardPage = () => {
                       setIsModalOpen(false);
                       setEditingAccount(null);
                       fetchAccounts();
+                      fetchUser();
                     }}
                     onError={(msg) => {
                       setIsModalOpen(false);
@@ -210,16 +219,17 @@ const DashboardPage = () => {
               <div className="flex justify-center items-center h-32">
                 <p className="text-gray-500">Loading accounts...</p>
               </div>
-            ) : !accounts || accounts.length === 0 ? (
+            ) : filteredAccounts.length === 0 ? (
               <div className="flex justify-center items-center h-32">
-                <p className="text-gray-500">No accounts added yet.</p>
+                <p className="text-gray-500">No {activeTab} accounts added yet.</p>
               </div>
             ) : (
-              <AccountList accounts={accounts} onDelete={handleDeleteAccount} onEdit={(account) => {
+              <AccountList accounts={filteredAccounts} onDelete={handleDeleteAccount} onEdit={(account) => {
                 setEditingAccount(account);
                 setIsModalOpen(true);
               }} />
             )}
+
 
             {accountError && (
               <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-60 p-4">

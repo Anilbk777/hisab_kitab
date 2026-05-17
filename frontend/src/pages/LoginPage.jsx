@@ -131,6 +131,9 @@ const LoginPage = () => {
       if (!res.ok) throw new Error(data?.detail || 'Login failed. Please try again.');
 
       localStorage.setItem('hk_token', data.access_token);
+      if (data.refresh_token) {
+        localStorage.setItem('hk_refresh_token', data.refresh_token);
+      }
       navigate('/dashboard');
     } catch (err) {
       const msg = err.message === 'Failed to fetch' 
