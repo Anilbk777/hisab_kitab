@@ -154,7 +154,6 @@ const DashboardPage = () => {
 
         {/* Dashboard Content */}
         <main style={styles.main}>
-          <h2 style={styles.sectionTitle}>Overview</h2>
           {/* date range search */}
           <div className="flex flex-col md:flex-row md:items-center gap-3 my-4 p-4 bg-white/75 backdrop-blur-md border border-gray-100 rounded-2xl shadow-sm">
             <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
@@ -404,7 +403,7 @@ const styles = {
     transition: 'all 0.2s',
   },
   main: {
-    padding: '32px 0',
+    padding: '16px 0',
     flex: 1,
   },
   sectionTitle: {
