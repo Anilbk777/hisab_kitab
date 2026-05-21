@@ -8,7 +8,6 @@ from backend.core.database import get_db
 from typing import Annotated    
 
 
-
 class SecurityService:
     def __init__(self):
         self.password_hasher = PasswordHash.recommended()
