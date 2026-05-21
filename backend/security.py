@@ -3,9 +3,9 @@ import jwt
 from pwdlib import PasswordHash
 
 from backend.core.config import settings
-from backend.models.model import User
-from backend.core.database import get_db
-from typing import Annotated    
+# from backend.models.model import User
+# from backend.core.database import get_db
+# from typing import Annotated    
 
 
 class SecurityService:
