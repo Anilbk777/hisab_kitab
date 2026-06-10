@@ -69,13 +69,13 @@ const InputField = ({ id, label, type = 'text', value, onChange, placeholder, ri
         }}
         onFocus={e => {
           e.target.style.borderColor = '#2563EB';
-          e.target.style.boxShadow  = '0 0 0 3px rgba(37,99,235,0.12)';
+          e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.12)';
           e.target.style.background = '#FFFFFF';
         }}
         onBlur={e => {
           e.target.style.borderColor = '#E2DAF0';
-          e.target.style.boxShadow   = 'none';
-          e.target.style.background  = '#F5F1FB';
+          e.target.style.boxShadow = 'none';
+          e.target.style.background = '#F5F1FB';
         }}
       />
       {rightEl && (
@@ -93,10 +93,10 @@ const InputField = ({ id, label, type = 'text', value, onChange, placeholder, ri
 const LoginPage = () => {
   const navigate = useNavigate();
 
-  const [form,     setForm]     = useState({ phone: '', password: '' });
+  const [form, setForm] = useState({ phone: '', password: '' });
   const [showPass, setShowPass] = useState(false);
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = key => e => setForm(f => ({ ...f, [key]: e.target.value }));
 
@@ -108,14 +108,14 @@ const LoginPage = () => {
       setError('Please fill in all fields.');
       return;
     }
-
+    const API_BASE = import.meta.env.VITE_API_URL
     setLoading(true);
     try {
       const formData = new URLSearchParams();
       formData.append('username', form.phone.trim());
       formData.append('password', form.password);
 
-      const res  = await fetch('/api/auth/login', {
+      const res = await fetch(API_BASE + '/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData.toString(),
@@ -136,8 +136,8 @@ const LoginPage = () => {
       }
       navigate('/dashboard');
     } catch (err) {
-      const msg = err.message === 'Failed to fetch' 
-        ? 'Unable to connect to server. Is the backend running?' 
+      const msg = err.message === 'Failed to fetch'
+        ? 'Unable to connect to server. Is the backend running?'
         : err.message;
       setError(msg);
     } finally {
@@ -208,7 +208,7 @@ const LoginPage = () => {
             style={{
               ...styles.gradientBtn,
               opacity: loading ? 0.75 : 1,
-              cursor:  loading ? 'not-allowed' : 'pointer',
+              cursor: loading ? 'not-allowed' : 'pointer',
             }}
             onMouseEnter={e => { if (!loading) e.target.style.boxShadow = '0 6px 28px rgba(59, 130, 246, 0.5)'; }}
             onMouseLeave={e => { e.target.style.boxShadow = styles.gradientBtn.boxShadow; }}

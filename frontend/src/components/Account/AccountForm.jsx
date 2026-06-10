@@ -36,8 +36,8 @@ function AccountForm({ account, onSuccess, onError }) {
                 account_type: accountType,
             };
             const url = account
-                ? `http://localhost:8000/api/accounts/${account.id}`
-                : "http://localhost:8000/api/accounts";
+                ? `/api/accounts/${account.id}`
+                : "/api/accounts";
 
             const method = account ? "PATCH" : "POST";
 

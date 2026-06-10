@@ -18,6 +18,7 @@ const DashboardPage = () => {
   const [editingAccount, setEditingAccount] = useState(null);
   const [accountError, setAccountError] = useState(null);
   const [activeTab, setActiveTab] = useState('income');
+  const API_BASE = import.meta.env.VITE_API_URL
 
   // Helpers to get current month date range bounds in YYYY-MM-DD format
   const getFirstDayOfMonth = () => {
@@ -79,7 +80,7 @@ const DashboardPage = () => {
 
   const fetchAccounts = useCallback(async (from = fromDate, to = toDate) => {
     try {
-      const url = `http://127.0.0.1:8000/api/accounts/?from_date=${from}&to_date=${to}`;
+      const url = `/api/accounts/?from_date=${from}&to_date=${to}`;
       const res = await fetchWithAuth(url);
 
       if (!res.ok) {
@@ -99,10 +100,10 @@ const DashboardPage = () => {
   useEffect(() => {
     fetchAccounts(getFirstDayOfMonth(), getLastDayOfMonth());
   }, [fetchAccounts]);
-
+  
   const handleDeleteAccount = async (id) => {
     try {
-      const res = await fetchWithAuth(`http://127.0.0.1:8000/api/accounts/${id}`, {
+      const res = await fetchWithAuth(`/api/accounts/${id}`, {
         method: "DELETE",
       });
 

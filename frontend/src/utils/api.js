@@ -17,16 +17,19 @@ export const fetchWithAuth = async (url, options = {}) => {
       ...options.headers,
     }
   };
+  const API_BASE = import.meta.env.VITE_API_URL
+  
 
-  let response = await fetch(url, finalOptions);
+  let response = await fetch(API_BASE + url, finalOptions);
+
 
   // If the token is invalid or expired
   if (response.status === 401) {
     const refreshToken = localStorage.getItem('hk_refresh_token');
-    
+
     if (refreshToken) {
       try {
-        const refreshResponse = await fetch('/api/auth/refresh', {
+        const refreshResponse = await fetch(`${API_BASE}/api/auth/refresh`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -36,13 +39,13 @@ export const fetchWithAuth = async (url, options = {}) => {
 
         if (refreshResponse.ok) {
           const data = await refreshResponse.json();
-          
+
           // Update tokens
           localStorage.setItem('hk_token', data.access_token);
           if (data.refresh_token) {
             localStorage.setItem('hk_refresh_token', data.refresh_token);
           }
-          
+
           // Update the Authorization header and retry the original request
           finalOptions.headers['Authorization'] = `Bearer ${data.access_token}`;
           response = await fetch(url, finalOptions);

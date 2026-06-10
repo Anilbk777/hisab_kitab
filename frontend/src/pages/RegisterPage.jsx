@@ -104,6 +104,7 @@ const RegisterPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const API_BASE = import.meta.env.VITE_API_URL
 
     const handleChange = key => e => setForm(f => ({ ...f, [key]: e.target.value }));
     const strength = strengthInfo(form.password);
@@ -127,7 +128,7 @@ const RegisterPage = () => {
 
         setLoading(true);
         try {
-            const res = await fetch('/api/auth/register', {
+            const res = await fetch(API_BASE + '/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

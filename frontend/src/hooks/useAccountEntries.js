@@ -13,7 +13,7 @@ export function useAccountEntries(accountId) {
         setError(null);
         try {
             const skip = (page - 1) * limit;
-            const res = await fetchWithAuth(`http://127.0.0.1:8000/api/entries/account/${accountId}?skip=${skip}&limit=${limit}`);
+            const res = await fetchWithAuth(`/api/entries/account/${accountId}?skip=${skip}&limit=${limit}`);
             if (!res.ok) throw new Error('Failed to fetch account details');
             const result = await res.json();
             setData(result);
@@ -29,7 +29,7 @@ export function useAccountEntries(accountId) {
     }, [fetchAccountData]);
 
     const createEntry = async (payload) => {
-        const res = await fetchWithAuth(`http://127.0.0.1:8000/api/entries/`, {
+        const res = await fetchWithAuth(`/api/entries/`, {
             method: 'POST',
             body: JSON.stringify({ ...payload, account_id: Number(accountId) })
         });
@@ -49,7 +49,7 @@ export function useAccountEntries(accountId) {
     };
 
     const updateEntry = async (entryId, payload) => {
-        const res = await fetchWithAuth(`http://127.0.0.1:8000/api/entries/${entryId}`, {
+        const res = await fetchWithAuth(`/api/entries/${entryId}`, {
             method: 'PATCH',
             body: JSON.stringify(payload)
         });
@@ -69,7 +69,7 @@ export function useAccountEntries(accountId) {
     };
 
     const deleteEntry = async (entryId) => {
-        const res = await fetchWithAuth(`http://127.0.0.1:8000/api/entries/${entryId}`, {
+        const res = await fetchWithAuth(`/api/entries/${entryId}`, {
             method: 'DELETE'
         });
         if (!res.ok) throw new Error('Failed to delete entry');
