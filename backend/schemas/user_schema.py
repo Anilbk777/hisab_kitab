@@ -88,7 +88,7 @@ class UserUpdate(BaseModel):
 class UserLogin(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     number: str = Field(..., examples=["9812345678"])
-    password: str = Field(..., min_length=8, examples=["MySecurePass@123"])
+    password: str = Field(..., examples=["MySecurePass@123"])
 
 
 class UserResponse(UserBase):

@@ -195,11 +195,11 @@ const LoginPage = () => {
           />
 
           {/* Forgot password */}
-          <div className="flex justify-end" style={{ marginTop: -6 }}>
+          {/* <div className="flex justify-end" style={{ marginTop: -6 }}>
             <button type="button" style={styles.textLink}>
               Forgot password?
             </button>
-          </div>
+          </div> */}
 
           {/* Submit */}
           <button
