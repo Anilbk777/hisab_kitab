@@ -194,12 +194,6 @@ const LoginPage = () => {
             }
           />
 
-          {/* Forgot password */}
-          {/* <div className="flex justify-end" style={{ marginTop: -6 }}>
-            <button type="button" style={styles.textLink}>
-              Forgot password?
-            </button>
-          </div> */}
 
           {/* Submit */}
           <button
@@ -232,7 +226,12 @@ const LoginPage = () => {
           Don't have an account?{' '}
           <Link to="/register" style={styles.accentLink}>Create one</Link>
         </p>
+        <div className="flex justify-center mt-4">
+          <p>test-number:[9801234567]</p>
+          <p>test-password:[ram@1234]</p>
+        </div>
       </div>
+
     </div>
   );
 };
